@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo ypspur-coordinator --admask 00000111 --speed 57600 $*
+ypspur-coordinator --admask 00000111 --speed 57600 $*
+
