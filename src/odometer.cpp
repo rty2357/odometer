@@ -35,10 +35,10 @@ const char __Debug_Log__[] = "debug.log.txt";
 
 int main(int argc, char *argv[]) {
 	SSMApi<Spur_Odometry>	ssm_odometry;	// gyro_odm
-	SSMApi<Spur_Odometry>	ssm_adjust;	// spur_adjust
-	SSMApi<PWSMotor>		ssm_mtr;	// moter ssm
-	SSMApi<YP_ad>			ssm_ad;		// ad
-	SSMApi_OdometryErr		ssm_odmerr;	// odometry error ratio
+	SSMApi<Spur_Odometry>	ssm_adjust;		// spur_adjust
+	SSMApi<PWSMotor>		ssm_mtr;		// moter ssm
+	SSMApi<YP_ad>			ssm_ad;			// ad
+	SSMApi_OdometryErr		ssm_odmerr;		// odometry error ratio
 	struct {
 		double radius_r;
 		double radius_l;
