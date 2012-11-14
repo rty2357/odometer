@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	Odometer::proc_option opt(&pconf);		// process option
 
 	FILE* fp = 0;
-	gnd::cui pcui;
+	gnd::cui_reader cuireader;
 
 
 	{ // ---> initialize
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 		} // <--- ssm pws-motor open
 
 		// initialize cui
-		pcui.set_command(cui_cmd, sizeof(cui_cmd) / sizeof(cui_cmd[0]));
+		cuireader.set_command( Odometer::cui_cmd, sizeof( Odometer::cui_cmd ) / sizeof( Odometer::cui_cmd[0] ));
 
 		if(pconf.debug.value){
 			fp = ::fopen(__Debug_Log__, "w");
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 				char cuiarg[512];
 
 				::memset(cuiarg, 0, sizeof(cuiarg));
-				if( pcui.poll(&cuival, cuiarg, sizeof(cuiarg), cuito) > 0 ){
+				if( cuireader.poll(&cuival, cuiarg, sizeof(cuiarg), cuito) > 0 ){
 					if( show_st ){
 						// if show status mode, quit show status mode
 						show_st = false;
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
 						// exit
 						case 'Q': ::proc_shutoff();				break;
 						// help
-						case 'h': pcui.show(stderr, "   ");		break;
+						case 'h': cuireader.show(stderr, "   ");		break;
 						// show status
 						case 's': show_st = true;				break;
 						// stand-by mode
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]) {
 						}
 					}
 					::fprintf(stderr, "  \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m > ", Odometer::proc_name);
-					pcui.poll(&cuival, cuiarg, sizeof( cuiarg ), 0);
+					cuireader.poll(&cuival, cuiarg, sizeof( cuiarg ), 0);
 				}
 			}// ---> cui
 
@@ -338,8 +338,8 @@ int main(int argc, char *argv[]) {
 
 					::fprintf(stderr, "\x1b[0;0H\x1b[2J");	// display clear
 					::fprintf(stderr, "-------------------- \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m --------------------\n", Odometer::proc_name);
-					::fprintf(stderr, "    position : %.02lf %.02lf %.01lf\n", ssm_odometry.data.x, ssm_odometry.data.y,  gnd_ang2deg(ssm_odometry.data.theta) );
-					::fprintf(stderr, "    velocity : v %.02lf  w %.03lf\n", ssm_odometry.data.v, gnd_ang2deg(ssm_odometry.data.w) );
+					::fprintf(stderr, "    position : %.02lf[m] %.02lf[m] %.01lf[deg]\n", ssm_odometry.data.x, ssm_odometry.data.y,  gnd_ang2deg(ssm_odometry.data.theta) );
+					::fprintf(stderr, "    velocity : v %.02lf[m/s]  w %.03lf[deg/s]\n", ssm_odometry.data.v, gnd_ang2deg(ssm_odometry.data.w) );
 					::fprintf(stderr, "        mode : %s\n", pconf.gyrodometry.value ? "gyrodometry" : "odometry" );
 					::fprintf(stderr, "\n");
 					::fprintf(stderr, " Push \x1b[1mEnter\x1b[0m to change CUI Mode\n");
@@ -438,6 +438,7 @@ int main(int argc, char *argv[]) {
 
 	{ // ---> finalize
 		::endSSM();
+		::fprintf(stderr, "\n");
 		::fprintf(stderr, "Finish.\x1b[49m\n");
 	} // <--- finalize
 

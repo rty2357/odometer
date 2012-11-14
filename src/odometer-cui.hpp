@@ -10,14 +10,15 @@
 
 #include "gnd-cui.hpp"
 
-const struct gnd::CUI::command cui_cmd[] = {
-		{"Quit",		'Q',	"localizer shut-off"},
-		{"help",		'h',	"show help"},
-		{"show",		's',	"state show mode"},
-		{"stand-by",	'B',	"operation stop and wait cui-command"},
-		{"start",		'o',	"start operation"},
-		{"debug-log",	'D',	"change debug mode on/off"},
-		{"", '\0'}
-};
-
+namespace Odometer {
+	const gnd::cui_command cui_cmd[] = {
+			{"Quit",		'Q',	"localizer shut-off"},
+			{"help",		'h',	"show help"},
+			{"show",		's',	"state show mode"},
+			{"stand-by",	'B',	"operation stop and wait cui-command"},
+			{"start",		'o',	"start operation"},
+			{"debug-log",	'D',	"change debug mode on/off"},
+			{"", '\0'}
+	};
+}
 #endif /* GYRODOMETRY_CUI_HPP_ */
