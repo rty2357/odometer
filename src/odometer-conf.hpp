@@ -145,7 +145,7 @@ namespace Odometer {
 	};
 
 	/*
-	 * @brief configure parameter for debug mode
+	 * @brief configuration parameter for debug mode
 	 */
 	static const gnd::Conf::parameter<bool> ConfIni_SpurAdjust = {
 			"spur-adjust",
@@ -155,12 +155,30 @@ namespace Odometer {
 
 
 	/*
-	 * @brief configure parameter for debug mode
+	 * @brief configuration parameter for debug mode
 	 */
 	static const gnd::Conf::parameter<bool> ConfIni_Gyrodometry = {
 			"gyrodometry",
 			false,
 			"gyrodometry mode"
+	};
+
+	/**
+	 * @brief configuration error simulation
+	 */
+	static const gnd::Conf::parameter<double> ConfIni_ErrorSimulation = {
+			"error-simulation",
+			0.0,
+			"error-simulation (probability of generation per 1.0m)"
+	};
+
+	/**
+	 * @brief configuration error simulation (error distribution)
+	 */
+	static const gnd::Conf::parameter_array<double, 3> ConfIni_ErrorDistribution = {
+			"error-distribution",
+			{0.0, 0.0, 0.0},
+			"error simulation (error distribution)"
 	};
 
 	/*
@@ -180,30 +198,34 @@ namespace Odometer {
 	 * \brief particle localizer configure
 	 */
 	struct proc_configuration {
-		proc_configuration();									///< constructor
+		proc_configuration();											///< constructor
 
-		gnd::Conf::parameter_array<char, 512>	kfile;			///< kinematics parameter file
+		gnd::Conf::parameter_array<char, 512>	kfile;					///< kinematics parameter file
 
-		gnd::Conf::parameter_array<char, 32>	output_ssmname;	///< output ssm-data name
-		gnd::Conf::parameter<int>				output_ssmid;	///< output ssm-data id
+		gnd::Conf::parameter_array<char, 32>	output_ssmname;			///< output ssm-data name
+		gnd::Conf::parameter<int>				output_ssmid;			///< output ssm-data id
 
-		gnd::Conf::parameter_array<char, 32>	odmerr_name;	///< input ssm-data name
-		gnd::Conf::parameter<int>				odmerr_id;		///< input ssm-data id
+		gnd::Conf::parameter_array<char, 32>	odmerr_name;			///< input ssm-data name
+		gnd::Conf::parameter<int>				odmerr_id;				///< input ssm-data id
 
-		gnd::Conf::parameter_array<char, 32>	ad_ssmname;		///< a/d ssm-data name
-		gnd::Conf::parameter<int>				ad_ssmid;		///< a/d ssm-data id
-		gnd::Conf::parameter<int>				ratio_port;		///< a/d port of ratio data
-		gnd::Conf::parameter<int>				ad_bits;		///< number of a/d converter bits
-		gnd::Conf::parameter<double> 			voltage;		///< a/d port voltage [mV]
-		gnd::Conf::parameter<double> 			bias;			///< bias of gyro sensor
-		gnd::Conf::parameter<double> 			scale_factor;	///< gyro sensor scale factor
+		gnd::Conf::parameter_array<char, 32>	ad_ssmname;				///< a/d ssm-data name
+		gnd::Conf::parameter<int>				ad_ssmid;				///< a/d ssm-data id
+		gnd::Conf::parameter<int>				ratio_port;				///< a/d port of ratio data
+		gnd::Conf::parameter<int>				ad_bits;				///< number of a/d converter bits
+		gnd::Conf::parameter<double> 			voltage;				///< a/d port voltage [mV]
+		gnd::Conf::parameter<double> 			bias;					///< bias of gyro sensor
+		gnd::Conf::parameter<double> 			scale_factor;			///< gyro sensor scale factor
 
-		gnd::Conf::parameter_array<char, 32>	motor_ssmname;	///< pws motor ssm-data name
-		gnd::Conf::parameter<int>				motor_ssmid;	///< pws motor ssm-data id
+		gnd::Conf::parameter_array<char, 32>	motor_ssmname;			///< pws motor ssm-data name
+		gnd::Conf::parameter<int>				motor_ssmid;			///< pws motor ssm-data id
 
-		gnd::Conf::parameter<bool> 				spur_adjust;	///< spur adjust mode
-		gnd::Conf::parameter<bool> 				gyrodometry;	///< gyrodometry mode
-		gnd::Conf::parameter<bool> 				debug;			///< debug mode
+		gnd::Conf::parameter<bool> 				spur_adjust;			///< spur adjust mode
+		gnd::Conf::parameter<bool> 				gyrodometry;			///< gyrodometry mode
+
+		gnd::Conf::parameter<double>				error_simulation;		///< error simulation
+		gnd::Conf::parameter_array<double, 3>	error_distributuion;	///< error generate
+
+		gnd::Conf::parameter<bool> 				debug;					///< debug mode
 	};
 	typedef struct proc_configuration configure_parameters;
 
@@ -253,6 +275,8 @@ namespace Odometer {
 		::memcpy(&conf->spur_adjust,	&ConfIni_SpurAdjust,		sizeof(ConfIni_SpurAdjust) );
 
 		::memcpy(&conf->gyrodometry,	&ConfIni_Gyrodometry,		sizeof(ConfIni_Gyrodometry) );
+		::memcpy(&conf->error_simulation,	&ConfIni_ErrorSimulation,		sizeof(ConfIni_ErrorSimulation) );
+		::memcpy(&conf->error_distributuion,	&ConfIni_ErrorDistribution,		sizeof(ConfIni_ErrorDistribution) );
 
 		::memcpy(&conf->debug,			&ConfIni_Debug,				sizeof(ConfIni_Debug) );
 
@@ -292,6 +316,9 @@ namespace Odometer {
 
 		gnd::Conf::get_parameter(src, &dest->gyrodometry);
 
+		gnd::Conf::get_parameter(src, &dest->error_simulation);
+		gnd::Conf::get_parameter(src, &dest->error_distributuion);
+
 		gnd::Conf::get_parameter(src, &dest->debug);
 		return 0;
 	}
@@ -328,6 +355,8 @@ namespace Odometer {
 		gnd::Conf::get_parameter(dest, &src->spur_adjust);
 
 		gnd::Conf::set_parameter(dest, &src->gyrodometry);
+		gnd::Conf::set_parameter(dest, &src->error_simulation);
+		gnd::Conf::set_parameter(dest, &src->error_distributuion);
 
 		gnd::Conf::set_parameter(dest, &src->debug);
 		return 0;

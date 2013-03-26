@@ -24,6 +24,7 @@
 #include "odometer-opt.hpp"
 #include "odometer-cui.hpp"
 
+#include "gnd-random.hpp"
 #include "gnd-shutoff.hpp"
 #include "gnd-util.h"
 
@@ -171,7 +172,7 @@ int main(int argc, char *argv[]) {
 				::proc_shutoff();
 			}
 			else {
-				ssm_odometry.write();
+//				ssm_odometry.write();
 				::fprintf(stderr, "  ... \x1b[1mOK\x1b[0m\n");
 			}
 		} // <--- ssm jyro-odometry open
@@ -258,7 +259,15 @@ int main(int argc, char *argv[]) {
 		double bias	= pconf.bias.value;
 		double bias_update_ratio = 0.01;
 
+		bool error_generate = false;
+
 		init_time = ssm_mtr.time;
+
+		if(pconf.error_simulation.value > 0.0){ // ---> error simulation initialize
+			gnd_random_set_seed();
+			error_generate = pconf.error_distributuion.value[0] || pconf.error_distributuion.value[1] ||  pconf.error_distributuion.value[2];
+		} // <--- error simulation initialize
+
 
 		// ---> while
 		while( !::is_proc_shutoff() ){
@@ -394,6 +403,25 @@ int main(int argc, char *argv[]) {
 					ssm_odometry.data.y += v * dt * ::sin(ssm_odometry.data.theta);
 					ssm_odometry.data.theta += w * dt;
 
+					// ---> error simulation
+					if( error_generate && pconf.error_simulation.value * v * dt > gnd_random_uniform() ){
+						gnd::matrix::fixed<3, 1> ws, error;
+						gnd::matrix::fixed<3, 3> error_distribution;
+
+						gnd::matrix::set_zero(&error_distribution);
+						error_distribution[0][0] = pconf.error_distributuion.value[0] * pconf.error_distributuion.value[0];
+						error_distribution[1][1] = pconf.error_distributuion.value[1] * pconf.error_distributuion.value[1];
+						error_distribution[2][2] = gnd_deg2ang(pconf.error_distributuion.value[2]) * gnd_deg2ang(pconf.error_distributuion.value[2]);
+
+						gnd_random_gaussian_mult( &error_distribution, 3, &ws, &error );
+
+						ssm_odometry.data.x += v * error[0][0];
+						ssm_odometry.data.y += v * error[1][0];
+						ssm_odometry.data.theta += error[2][0];
+						fprintf(fp, "#error %lf %lf %lf %lf\n", ssm_odometry.time - init_time,
+								error[0][0], error[1][0], error[2][0]);
+					} // <--- error simulation
+
 					ssm_odometry.write( ssm_mtr.time );
 					prev_time = ssm_mtr.time;
 					if( ssm_adjust.isOpen() ) {
@@ -409,6 +437,8 @@ int main(int argc, char *argv[]) {
 								ssm_ad.data.ad[pconf.ratio_port.value], bias);
 					}
 				} // <--- transration
+
+
 			} // <--- read encoder counter
 
 			while( !::is_proc_shutoff() && ssm_odmerr.readNext() ){ // ---> marge odm error
@@ -419,6 +449,10 @@ int main(int argc, char *argv[]) {
 				}
 
 				ssm_odometry.write( ssm_mtr.time );
+				if( ssm_adjust.isOpen() ) {
+					ssm_adjust.data = ssm_odometry.data;
+					ssm_adjust.write( ssm_mtr.time );
+				}
 
 				// debug log
 				if(pconf.debug.value && fp){
@@ -429,6 +463,7 @@ int main(int argc, char *argv[]) {
 							bias);
 				}
 			} // ---> marge odm error
+
 
 		} // <--- while
 
