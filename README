@@ -25,3 +25,8 @@ README: odometer
  ・"ssm-odometry-error-id"の項目に正の値を入力(odometry-correctorと共通の値)
  ・"ssm-odometry-error-name"の項目にnullにしない(odometry-correctorと共通の値)
  
+・終了
+  以下の2通りの終了方法があります
+  1. ctrl+c (シグナル"SIGINT"の送信)
+  2. 実行時CUIモードにて"Q"もしくは"Quit"コマンドを実行
+ 
