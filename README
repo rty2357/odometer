@@ -1,0 +1,27 @@
+README: odometer
+
+基本的な使用方法について記述
+
+コンパイル
+・依存ライブラリ
+  ssm
+  ypspur
+
+・以下のコマンドでディレクトリReleaseに実行ファイルを生成
+  $ make
+
+実行
+コンフィグレーションファイルにてパラメータを指定します
+
+・コンフィグレーションファイルの生成
+  $ odometer -G
+  ※ コンフィグレーションファイル"odometer.conf"が生成されます
+     各パラメータはデフォルトの値になっています
+ 
+・実行
+ $ odometer -g <configuration-file>
+
+ 地図に基づいて系統誤差を修正する場合は以下の様にします
+ ・"ssm-odometry-error-id"の項目に正の値を入力(odometry-correctorと共通の値)
+ ・"ssm-odometry-error-name"の項目にnullにしない(odometry-correctorと共通の値)
+ 
