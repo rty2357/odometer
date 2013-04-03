@@ -32,7 +32,7 @@
 int read_kinematics_config(double* radius_r, double* radius_l, double* tread, double* gear, double* count_rev, const char* fname);
 
 
-const char __Debug_Log__[] = "debug.log.txt";
+const char __Debug_Log__[] = "log.txt";
 
 int main(int argc, char *argv[]) {
 	SSMApi<Spur_Odometry>	ssm_odometry;	// gyro_odm
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
 //				ssm_odometry.write();
 				::fprintf(stderr, "  ... \x1b[1mOK\x1b[0m\n");
 			}
-		} // <--- ssm jyro-odometry open
+		} // <--- ssm gyro-odometry open
 
 
 		if( !::is_proc_shutoff() && pconf.spur_adjust.value && ::strcmp(pconf.output_ssmname.value, SNAME_ADJUST) ) {
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 			}
 			else {
 				ssm_mtr.setBlocking(true);
-				ssm_mtr.readLast();
+//				ssm_mtr.readLast();
 				::fprintf(stderr, "  ... \x1b[1mOK\x1b[0m\n");
 			}
 		} // <--- ssm pws-motor open
@@ -271,95 +271,6 @@ int main(int argc, char *argv[]) {
 
 		// ---> while
 		while( !::is_proc_shutoff() ){
-			{ // ---> cui
-				int cuival = 0;
-				char cuiarg[512];
-
-				::memset(cuiarg, 0, sizeof(cuiarg));
-				if( cuireader.poll(&cuival, cuiarg, sizeof(cuiarg), cuito) > 0 ){
-					if( show_st ){
-						// if show status mode, quit show status mode
-						show_st = false;
-						::fprintf(stderr, "-------------------- cui mode --------------------\n");
-					}
-					else {
-						switch(cuival) {
-						// exit
-						case 'Q': ::proc_shutoff();				break;
-						// help
-						case 'h': cuireader.show(stderr, "   ");		break;
-						// show status
-						case 's': show_st = true;				break;
-						// stand-by mode
-						case 'B': cuito = -1;					break;
-						// start
-						case 'o': cuito = 0;					break;
-						// debug log-mode
-						case 'D': {
-							::fprintf(stderr, "   => debug-log mode\n");
-							if( ::strncmp("on", cuiarg, 2) == 0){
-								bool flg = fp ? true : false;
-
-								if( !fp && !(fp = fopen(__Debug_Log__, "w")) ) {
-									::fprintf(stderr, "    ... \x1b[1m\x1b[31mError\x1b[39m\x1b[0m: fail to open \"\x1b[4m%s\x1b[0m\"", __Debug_Log__);
-									pconf.debug.value = false;
-								}
-								else if( flg ){
-									fprintf(fp, "# 1.[time] 2.[x] 3.[y] 4.[theta] 5.[v] 6.[w] 7.[wh mean] 8.[wh ratio] 9.[trd ratio] 10.[pwm1] 11.[pwm2] 12.[counter1] 13.[counter2]\n");
-									pconf.debug.value = true;
-									::fprintf(stderr, "    ... \x1b[1mon\x1b[0m\n");
-								}
-								else {
-									pconf.debug.value = true;
-									::fprintf(stderr, "    ... \x1b[1mon\x1b[0m\n");
-								}
-							}
-							else if( ::strncmp("off", cuiarg, 3) == 0){
-								pconf.debug.value = false;
-								::fprintf(stderr, "    ... \x1b[1moff\x1b[0m\n");
-							}
-							else {
-								::fprintf(stderr, "   ... %s\n", pconf.debug.value ? "on": "off");
-								::fprintf(stderr, "   if you want to change mode, input \"on/off\"\n");
-							}
-						}
-						break;
-						case '\0':								break;
-						default:
-							::fprintf(stderr, "   ... \x1b[31m\x1b[1mError\x1b[0m\x1b[39m: invalid command\n");
-							::fprintf(stderr, "       Please input \x1b[4mhelp\x1b[0m/\x1b[4mh\x1b[0m to show command\n");
-							break;
-						}
-					}
-					::fprintf(stderr, "  \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m > ", Odometer::proc_name);
-					cuireader.poll(&cuival, cuiarg, sizeof( cuiarg ), 0);
-				}
-			}// ---> cui
-
-
-			if( show_st ){ // ---> show status
-				struct timespec cur;
-				static struct timespec next;
-				clock_gettime(CLOCK_REALTIME, &cur);
-
-				if( cur.tv_sec > next.tv_sec ||
-						( cur.tv_sec == next.tv_sec && cur.tv_nsec > next.tv_nsec )){
-
-					::fprintf(stderr, "\x1b[0;0H\x1b[2J");	// display clear
-					::fprintf(stderr, "-------------------- \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m --------------------\n", Odometer::proc_name);
-					::fprintf(stderr, "    position : %.02lf[m] %.02lf[m] %.01lf[deg]\n", ssm_odometry.data.x, ssm_odometry.data.y,  gnd_ang2deg(ssm_odometry.data.theta) );
-					::fprintf(stderr, "    velocity : v %.02lf[m/s]  w %.03lf[deg/s]\n", ssm_odometry.data.v, gnd_ang2deg(ssm_odometry.data.w) );
-					::fprintf(stderr, "        mode : %s\n", pconf.gyrodometry.value ? "gyrodometry" : "odometry" );
-					::fprintf(stderr, "\n");
-					::fprintf(stderr, " Push \x1b[1mEnter\x1b[0m to change CUI Mode\n");
-					next = cur;
-					next.tv_sec++;
-				}
-			} // <--- show status
-
-			// stand-by mode
-			if( cuito < 0)	continue;
-
 			// ---> read encoder counter
 			if( ssm_mtr.readNext() ){
 				double v, w;
@@ -464,6 +375,94 @@ int main(int argc, char *argv[]) {
 				}
 			} // ---> marge odm error
 
+			{ // ---> cui
+				int cuival = 0;
+				char cuiarg[512];
+
+				::memset(cuiarg, 0, sizeof(cuiarg));
+				if( cuireader.poll(&cuival, cuiarg, sizeof(cuiarg), cuito) > 0 ){
+					if( show_st ){
+						// if show status mode, quit show status mode
+						show_st = false;
+						::fprintf(stderr, "-------------------- cui mode --------------------\n");
+					}
+					else {
+						switch(cuival) {
+						// exit
+						case 'Q': ::proc_shutoff();				break;
+						// help
+						case 'h': cuireader.show(stderr, "   ");		break;
+						// show status
+						case 's': show_st = true;				break;
+						// stand-by mode
+						case 'B': cuito = -1;					break;
+						// start
+						case 'o': cuito = 0;					break;
+						// debug log-mode
+						case 'D': {
+							::fprintf(stderr, "   => debug-log mode\n");
+							if( ::strncmp("on", cuiarg, 2) == 0){
+								bool flg = fp ? true : false;
+
+								if( !fp && !(fp = fopen(__Debug_Log__, "w")) ) {
+									::fprintf(stderr, "    ... \x1b[1m\x1b[31mError\x1b[39m\x1b[0m: fail to open \"\x1b[4m%s\x1b[0m\"", __Debug_Log__);
+									pconf.debug.value = false;
+								}
+								else if( flg ){
+									fprintf(fp, "# 1.[time] 2.[x] 3.[y] 4.[theta] 5.[v] 6.[w] 7.[wh mean] 8.[wh ratio] 9.[trd ratio] 10.[pwm1] 11.[pwm2] 12.[counter1] 13.[counter2]\n");
+									pconf.debug.value = true;
+									::fprintf(stderr, "    ... \x1b[1mon\x1b[0m\n");
+								}
+								else {
+									pconf.debug.value = true;
+									::fprintf(stderr, "    ... \x1b[1mon\x1b[0m\n");
+								}
+							}
+							else if( ::strncmp("off", cuiarg, 3) == 0){
+								pconf.debug.value = false;
+								::fprintf(stderr, "    ... \x1b[1moff\x1b[0m\n");
+							}
+							else {
+								::fprintf(stderr, "   ... %s\n", pconf.debug.value ? "on": "off");
+								::fprintf(stderr, "   if you want to change mode, input \"on/off\"\n");
+							}
+						}
+						break;
+						case '\0':								break;
+						default:
+							::fprintf(stderr, "   ... \x1b[31m\x1b[1mError\x1b[0m\x1b[39m: invalid command\n");
+							::fprintf(stderr, "       Please input \x1b[4mhelp\x1b[0m/\x1b[4mh\x1b[0m to show command\n");
+							break;
+						}
+					}
+					::fprintf(stderr, "  \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m > ", Odometer::proc_name);
+					cuireader.poll(&cuival, cuiarg, sizeof( cuiarg ), 0);
+				}
+			}// ---> cui
+
+
+			if( show_st ){ // ---> show status
+				struct timespec cur;
+				static struct timespec next;
+				clock_gettime(CLOCK_REALTIME, &cur);
+
+				if( cur.tv_sec > next.tv_sec ||
+						( cur.tv_sec == next.tv_sec && cur.tv_nsec > next.tv_nsec )){
+
+					::fprintf(stderr, "\x1b[0;0H\x1b[2J");	// display clear
+					::fprintf(stderr, "-------------------- \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m --------------------\n", Odometer::proc_name);
+					::fprintf(stderr, "    position : %.02lf[m] %.02lf[m] %.01lf[deg]\n", ssm_odometry.data.x, ssm_odometry.data.y,  gnd_ang2deg(ssm_odometry.data.theta) );
+					::fprintf(stderr, "    velocity : v %.02lf[m/s]  w %.03lf[deg/s]\n", ssm_odometry.data.v, gnd_ang2deg(ssm_odometry.data.w) );
+					::fprintf(stderr, "        mode : %s\n", pconf.gyrodometry.value ? "gyrodometry" : "odometry" );
+					::fprintf(stderr, "\n");
+					::fprintf(stderr, " Push \x1b[1mEnter\x1b[0m to change CUI Mode\n");
+					next = cur;
+					next.tv_sec++;
+				}
+			} // <--- show status
+
+			// stand-by mode
+			if( cuito < 0)	continue;
 
 		} // <--- while
 

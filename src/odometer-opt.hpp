@@ -24,7 +24,7 @@
 
 namespace Odometer {
 	const char ConfFile[] = "odometer.conf";
-	static const char ShortOpt[] = "hg:G::k:n:i:A:a:t:b:r:s:v:m:D:";
+	static const char ShortOpt[] = "hg:G::k:n:i:A:a:t:b:r:s:v:m:D::E::";
 
 	static const struct option LongOpt[] = {
 		{"help", 						no_argument,		0,	'h'},
@@ -46,7 +46,8 @@ namespace Odometer {
 
 		{ConfIni_MotorSSMName.token,	required_argument,	0,	'M'},
 		{ConfIni_MotorSSMID.token,		required_argument,	0,	'm'},
-		{ConfIni_Debug.token,			required_argument,	0,	'D'},
+		{ConfIni_Debug.token,			optional_argument,	0,	'D'},
+		{ConfIni_ErrorSimulation.token,	optional_argument,	0,	'E'},
 		{0, 0, 0, 0}	// end of array
 	};
 }
@@ -140,7 +141,24 @@ namespace Odometer {
 					conf->debug.value = false;
 				}
 				else {
-					::fprintf(stderr, " ... [\x1b[1m\x1b[31mERROR\x1b[30m\x1b[0m]: -B option, configure file syntax error input argument on/off\n");
+					::fprintf(stderr, " ... [\x1b[1m\x1b[31mERROR\x1b[30m\x1b[0m]: -D option, configure file syntax error input argument on/off\n");
+					return RetFail;
+				}
+			}
+			break;
+
+			// Error Simulation
+			case 'E': {
+				if( optarg == 0 ) {
+				}
+				else if( ::strncmp("on", optarg, 2) == 0){
+				}
+				else if( ::strncmp("off", optarg, 3) == 0){
+					conf->error_simulation.value = 0.0;
+					::fprintf(stderr, " ... no error simulation\n");
+				}
+				else {
+					::fprintf(stderr, " ... [\x1b[1m\x1b[31mERROR\x1b[30m\x1b[0m]: -E option, configure file syntax error input argument on/off\n");
 					return RetFail;
 				}
 			}
