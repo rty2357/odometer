@@ -72,7 +72,7 @@ namespace Odometer {
 	 * @brief default configuration parameter : odometry error ratio with road surface environmental map
 	 */
 	static const gnd::Conf::parameter_array<char, 32> ConfIni_OdometryErrName = {
-			"ssm-name-odm-err",
+			"ssm-odometry-error-name",
 			SNAME_ODOMETRY_ERR,
 			"name of shared odometry error ratio data"
 	};
@@ -80,7 +80,7 @@ namespace Odometer {
 	 * @brief default configuration parameter of ssm-id of a/d data
 	 */
 	static const gnd::Conf::parameter<int> ConfIni_OdometryErrID = {
-			"ssm-id-odm-err",
+			"ssm-odometry-error-id",
 			-1,
 			"id of shared odometry error ratio data"
 	};
