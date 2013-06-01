@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <signal.h>
 #include <math.h>
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
 
 
 	{ // ---> initialize
-		size_t phase = 1;
+		uint32_t phase = 1;
 
 		// get option
 		if( opt.get_option(argc, argv) ){
@@ -264,7 +265,7 @@ int main(int argc, char *argv[]) {
 		init_time = ssm_mtr.time;
 
 		if(pconf.error_simulation.value > 0.0){ // ---> error simulation initialize
-			gnd_random_set_seed();
+			gnd::random_set_seed();
 			error_generate = pconf.error_distributuion.value[0] || pconf.error_distributuion.value[1] ||  pconf.error_distributuion.value[2];
 		} // <--- error simulation initialize
 
@@ -315,7 +316,7 @@ int main(int argc, char *argv[]) {
 					ssm_odometry.data.theta += w * dt;
 
 					// ---> error simulation
-					if( error_generate && pconf.error_simulation.value * v * dt > gnd_random_uniform() ){
+					if( error_generate && pconf.error_simulation.value * v * dt > gnd::random_uniform() ){
 						gnd::matrix::fixed<3, 1> ws, error;
 						gnd::matrix::fixed<3, 3> error_distribution;
 
@@ -324,7 +325,7 @@ int main(int argc, char *argv[]) {
 						error_distribution[1][1] = pconf.error_distributuion.value[1] * pconf.error_distributuion.value[1];
 						error_distribution[2][2] = gnd_deg2ang(pconf.error_distributuion.value[2]) * gnd_deg2ang(pconf.error_distributuion.value[2]);
 
-						gnd_random_gaussian_mult( &error_distribution, 3, &ws, &error );
+						gnd::random_gaussian_mult( &error_distribution, 3, &ws, &error );
 
 						ssm_odometry.data.x += v * error[0][0];
 						ssm_odometry.data.y += v * error[1][0];
