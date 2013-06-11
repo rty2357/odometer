@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <signal.h>
 #include <math.h>
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
 
 
 	{ // ---> initialize
-		size_t phase = 1;
+		uint32_t phase = 1;
 
 		// get option
 		if( opt.get_option(argc, argv) ){
