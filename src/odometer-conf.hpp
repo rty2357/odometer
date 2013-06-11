@@ -13,7 +13,7 @@
 
 #include "ssm-odometry-err.hpp"
 
-#include "gnd-configuration.hpp"
+#include "gnd-config-file.hpp"
 #include "gnd-lib-error.h"
 
 
@@ -26,7 +26,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of kinematics file
 	 */
-	static const gnd::Conf::parameter_array<char, 512> ConfIni_KFile = {
+	static const gnd::conf::parameter_array<char, 512> ConfIni_KFile = {
 			"k-file",
 			"",
 			"kinematics file path"
@@ -35,7 +35,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssn-name
 	 */
-	static const gnd::Conf::parameter_array<char, 32> ConfIni_SSMName = {
+	static const gnd::conf::parameter_array<char, 32> ConfIni_SSMName = {
 			"ssm-name",
 			__SSM_NAME_ODOMETRY__,
 			"name of shared odometer data"
@@ -43,7 +43,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-id
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_SSMID = {
+	static const gnd::conf::parameter<int> ConfIni_SSMID = {
 			"ssm-id",
 			0,
 			"id of shared gyrodometry data"
@@ -53,7 +53,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-name of a/d data
 	 */
-	static const gnd::Conf::parameter_array<char, 32> ConfIni_ADSSMName = {
+	static const gnd::conf::parameter_array<char, 32> ConfIni_ADSSMName = {
 			"ssm-name-ad",
 			SNAME_YPSPUR_AD,
 			"name of shared data a/d converter reading data"
@@ -61,7 +61,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-id of a/d data
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_ADSSMID = {
+	static const gnd::conf::parameter<int> ConfIni_ADSSMID = {
 			"ssm-id-ad",
 			0,
 			"id of shared a/d converter reading data"
@@ -71,7 +71,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter : odometry error ratio with road surface environmental map
 	 */
-	static const gnd::Conf::parameter_array<char, 32> ConfIni_OdometryErrName = {
+	static const gnd::conf::parameter_array<char, 32> ConfIni_OdometryErrName = {
 			"ssm-odometry-error-name",
 			SNAME_ODOMETRY_ERR,
 			"name of shared odometry error ratio data"
@@ -79,7 +79,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-id of a/d data
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_OdometryErrID = {
+	static const gnd::conf::parameter<int> ConfIni_OdometryErrID = {
 			"ssm-odometry-error-id",
 			-1,
 			"id of shared odometry error ratio data"
@@ -88,7 +88,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of gyro a/d converter port
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_RatioPort = {
+	static const gnd::conf::parameter<int> ConfIni_RatioPort = {
 			"ratio-port",
 			0,
 			"a/d converter port No of ratio"
@@ -96,7 +96,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of a/d converter bits
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_ADBits = {
+	static const gnd::conf::parameter<int> ConfIni_ADBits = {
 			"ad-bits",
 			10,
 			"bits of a/d converter"
@@ -104,7 +104,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of gyro sensor voltage range
 	 */
-	static const gnd::Conf::parameter<double> ConfIni_Voltage = {
+	static const gnd::conf::parameter<double> ConfIni_Voltage = {
 			"voltage",
 			5000,				// mV
 			"voltage of a/d converter [mV]"
@@ -112,7 +112,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of gyro sensor bias
 	 */
-	static const gnd::Conf::parameter<double> ConfIni_Bias = {
+	static const gnd::conf::parameter<double> ConfIni_Bias = {
 			"bias",
 			ConfIni_Voltage.value / 2.0,
 			"bias voltage of gyro sensor [mV]"
@@ -120,7 +120,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of gyro sensor scale factor
 	 */
-	static const gnd::Conf::parameter<double> ConfIni_ScaleFactor = {
+	static const gnd::conf::parameter<double> ConfIni_ScaleFactor = {
 			"scale-factor",
 			20,					// mV/deg/sec
 			"scale factor of gyro sensor [mV/(deg/sec)]"
@@ -130,7 +130,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-id of motor
 	 */
-	static const gnd::Conf::parameter_array<char, 32> ConfIni_MotorSSMName = {
+	static const gnd::conf::parameter_array<char, 32> ConfIni_MotorSSMName = {
 			"ssm-name-pws",
 			SNAME_PWS_MOTOR,
 			"name of shared encorder counter data"
@@ -138,7 +138,7 @@ namespace Odometer {
 	/*
 	 * @brief default configuration parameter of ssm-id of motor
 	 */
-	static const gnd::Conf::parameter<int> ConfIni_MotorSSMID = {
+	static const gnd::conf::parameter<int> ConfIni_MotorSSMID = {
 			"ssm-id-pws",
 			0,
 			"id of shared encorder counter data"
@@ -147,7 +147,7 @@ namespace Odometer {
 	/*
 	 * @brief configuration parameter for debug mode
 	 */
-	static const gnd::Conf::parameter<bool> ConfIni_SpurAdjust = {
+	static const gnd::conf::parameter<bool> ConfIni_SpurAdjust = {
 			"spur-adjust",
 			false,
 			"adjust ypspur-coordinator's position"
@@ -157,7 +157,7 @@ namespace Odometer {
 	/*
 	 * @brief configuration parameter for debug mode
 	 */
-	static const gnd::Conf::parameter<bool> ConfIni_Gyrodometry = {
+	static const gnd::conf::parameter<bool> ConfIni_Gyrodometry = {
 			"gyrodometry",
 			false,
 			"gyrodometry mode"
@@ -166,7 +166,7 @@ namespace Odometer {
 	/**
 	 * @brief configuration error simulation
 	 */
-	static const gnd::Conf::parameter<double> ConfIni_ErrorSimulation = {
+	static const gnd::conf::parameter<double> ConfIni_ErrorSimulation = {
 			"error-simulation",
 			0.0,
 			"error-simulation (probability of generation per 1.0m)"
@@ -175,7 +175,7 @@ namespace Odometer {
 	/**
 	 * @brief configuration error simulation (error distribution)
 	 */
-	static const gnd::Conf::parameter_array<double, 3> ConfIni_ErrorDistribution = {
+	static const gnd::conf::parameter_array<double, 3> ConfIni_ErrorDistribution = {
 			"error-distribution",
 			{0.0, 0.0, 0.0},
 			"error simulation (error distribution)"
@@ -184,7 +184,7 @@ namespace Odometer {
 	/*
 	 * @brief configure parameter for debug mode
 	 */
-	static const gnd::Conf::parameter<bool> ConfIni_Debug = {
+	static const gnd::conf::parameter<bool> ConfIni_Debug = {
 			"debug",
 			false,
 			"debug mode"
@@ -200,32 +200,32 @@ namespace Odometer {
 	struct proc_configuration {
 		proc_configuration();											///< constructor
 
-		gnd::Conf::parameter_array<char, 512>	kfile;					///< kinematics parameter file
+		gnd::conf::parameter_array<char, 512>	kfile;					///< kinematics parameter file
 
-		gnd::Conf::parameter_array<char, 32>	output_ssmname;			///< output ssm-data name
-		gnd::Conf::parameter<int>				output_ssmid;			///< output ssm-data id
+		gnd::conf::parameter_array<char, 32>	output_ssmname;			///< output ssm-data name
+		gnd::conf::parameter<int>				output_ssmid;			///< output ssm-data id
 
-		gnd::Conf::parameter_array<char, 32>	odmerr_name;			///< input ssm-data name
-		gnd::Conf::parameter<int>				odmerr_id;				///< input ssm-data id
+		gnd::conf::parameter_array<char, 32>	odmerr_name;			///< input ssm-data name
+		gnd::conf::parameter<int>				odmerr_id;				///< input ssm-data id
 
-		gnd::Conf::parameter_array<char, 32>	ad_ssmname;				///< a/d ssm-data name
-		gnd::Conf::parameter<int>				ad_ssmid;				///< a/d ssm-data id
-		gnd::Conf::parameter<int>				ratio_port;				///< a/d port of ratio data
-		gnd::Conf::parameter<int>				ad_bits;				///< number of a/d converter bits
-		gnd::Conf::parameter<double> 			voltage;				///< a/d port voltage [mV]
-		gnd::Conf::parameter<double> 			bias;					///< bias of gyro sensor
-		gnd::Conf::parameter<double> 			scale_factor;			///< gyro sensor scale factor
+		gnd::conf::parameter_array<char, 32>	ad_ssmname;				///< a/d ssm-data name
+		gnd::conf::parameter<int>				ad_ssmid;				///< a/d ssm-data id
+		gnd::conf::parameter<int>				ratio_port;				///< a/d port of ratio data
+		gnd::conf::parameter<int>				ad_bits;				///< number of a/d converter bits
+		gnd::conf::parameter<double> 			voltage;				///< a/d port voltage [mV]
+		gnd::conf::parameter<double> 			bias;					///< bias of gyro sensor
+		gnd::conf::parameter<double> 			scale_factor;			///< gyro sensor scale factor
 
-		gnd::Conf::parameter_array<char, 32>	motor_ssmname;			///< pws motor ssm-data name
-		gnd::Conf::parameter<int>				motor_ssmid;			///< pws motor ssm-data id
+		gnd::conf::parameter_array<char, 32>	motor_ssmname;			///< pws motor ssm-data name
+		gnd::conf::parameter<int>				motor_ssmid;			///< pws motor ssm-data id
 
-		gnd::Conf::parameter<bool> 				spur_adjust;			///< spur adjust mode
-		gnd::Conf::parameter<bool> 				gyrodometry;			///< gyrodometry mode
+		gnd::conf::parameter<bool> 				spur_adjust;			///< spur adjust mode
+		gnd::conf::parameter<bool> 				gyrodometry;			///< gyrodometry mode
 
-		gnd::Conf::parameter<double>				error_simulation;		///< error simulation
-		gnd::Conf::parameter_array<double, 3>	error_distributuion;	///< error generate
+		gnd::conf::parameter<double>				error_simulation;		///< error simulation
+		gnd::conf::parameter_array<double, 3>	error_distributuion;	///< error generate
 
-		gnd::Conf::parameter<bool> 				debug;					///< debug mode
+		gnd::conf::parameter<bool> 				debug;					///< debug mode
 	};
 	typedef struct proc_configuration configure_parameters;
 
@@ -238,7 +238,7 @@ namespace Odometer {
 	/**
 	 * @brief analyze configure file
 	 */
-	int proc_conf_analyze(gnd::Conf::Configuration *fconf, proc_configuration *confp);
+	int proc_conf_analyze(gnd::conf::configuration *fconf, proc_configuration *confp);
 
 	proc_configuration::proc_configuration()
 	{
@@ -290,36 +290,36 @@ namespace Odometer {
 	 * @param [out] dest : configuration parameter
 	 */
 	inline
-	int proc_conf_get(gnd::Conf::Configuration *src, proc_configuration* dest) {
+	int proc_conf_get(gnd::conf::configuration *src, proc_configuration* dest) {
 		gnd_assert(!src, -1, "invalid null pointer");
 		gnd_assert(!dest, -1, "invalid null pointer");
 
-		gnd::Conf::get_parameter(src, &dest->kfile);
+		gnd::conf::get_parameter(src, &dest->kfile);
 
-		gnd::Conf::get_parameter(src, &dest->output_ssmname);
-		gnd::Conf::get_parameter(src, &dest->output_ssmid);
+		gnd::conf::get_parameter(src, &dest->output_ssmname);
+		gnd::conf::get_parameter(src, &dest->output_ssmid);
 
-		gnd::Conf::get_parameter(src, &dest->motor_ssmname);
-		gnd::Conf::get_parameter(src, &dest->motor_ssmid);
-		gnd::Conf::get_parameter(src, &dest->odmerr_name);
-		gnd::Conf::get_parameter(src, &dest->odmerr_id);
+		gnd::conf::get_parameter(src, &dest->motor_ssmname);
+		gnd::conf::get_parameter(src, &dest->motor_ssmid);
+		gnd::conf::get_parameter(src, &dest->odmerr_name);
+		gnd::conf::get_parameter(src, &dest->odmerr_id);
 
-		gnd::Conf::get_parameter(src, &dest->ad_ssmname);
-		gnd::Conf::get_parameter(src, &dest->ad_ssmid);
-		gnd::Conf::get_parameter(src, &dest->ad_bits);
-		gnd::Conf::get_parameter(src, &dest->ratio_port);
-		gnd::Conf::get_parameter(src, &dest->voltage);
-		gnd::Conf::get_parameter(src, &dest->bias);
-		gnd::Conf::get_parameter(src, &dest->scale_factor);
+		gnd::conf::get_parameter(src, &dest->ad_ssmname);
+		gnd::conf::get_parameter(src, &dest->ad_ssmid);
+		gnd::conf::get_parameter(src, &dest->ad_bits);
+		gnd::conf::get_parameter(src, &dest->ratio_port);
+		gnd::conf::get_parameter(src, &dest->voltage);
+		gnd::conf::get_parameter(src, &dest->bias);
+		gnd::conf::get_parameter(src, &dest->scale_factor);
 
-		gnd::Conf::get_parameter(src, &dest->spur_adjust);
+		gnd::conf::get_parameter(src, &dest->spur_adjust);
 
-		gnd::Conf::get_parameter(src, &dest->gyrodometry);
+		gnd::conf::get_parameter(src, &dest->gyrodometry);
 
-		gnd::Conf::get_parameter(src, &dest->error_simulation);
-		gnd::Conf::get_parameter(src, &dest->error_distributuion);
+		gnd::conf::get_parameter(src, &dest->error_simulation);
+		gnd::conf::get_parameter(src, &dest->error_distributuion);
 
-		gnd::Conf::get_parameter(src, &dest->debug);
+		gnd::conf::get_parameter(src, &dest->debug);
 		return 0;
 	}
 
@@ -330,35 +330,35 @@ namespace Odometer {
 	 * @param [int]  src : configuration parameter
 	 */
 	inline
-	int proc_conf_set(gnd::Conf::Configuration *dest, proc_configuration* src) {
+	int proc_conf_set(gnd::conf::configuration *dest, proc_configuration* src) {
 		gnd_assert(!src, -1, "invalid null pointer");
 		gnd_assert(!dest, -1, "invalid null pointer");
 
-		gnd::Conf::set_parameter(dest, &src->kfile);
+		gnd::conf::set_parameter(dest, &src->kfile);
 
-		gnd::Conf::set_parameter(dest, &src->output_ssmname);
-		gnd::Conf::set_parameter(dest, &src->output_ssmid);
+		gnd::conf::set_parameter(dest, &src->output_ssmname);
+		gnd::conf::set_parameter(dest, &src->output_ssmid);
 
-		gnd::Conf::set_parameter(dest, &src->motor_ssmname);
-		gnd::Conf::set_parameter(dest, &src->motor_ssmid);
-		gnd::Conf::set_parameter(dest, &src->odmerr_name);
-		gnd::Conf::set_parameter(dest, &src->odmerr_id);
+		gnd::conf::set_parameter(dest, &src->motor_ssmname);
+		gnd::conf::set_parameter(dest, &src->motor_ssmid);
+		gnd::conf::set_parameter(dest, &src->odmerr_name);
+		gnd::conf::set_parameter(dest, &src->odmerr_id);
 
-		gnd::Conf::set_parameter(dest, &src->ad_ssmname);
-		gnd::Conf::set_parameter(dest, &src->ad_ssmid);
-		gnd::Conf::set_parameter(dest, &src->ad_bits);
-		gnd::Conf::set_parameter(dest, &src->ratio_port);
-		gnd::Conf::set_parameter(dest, &src->voltage);
-		gnd::Conf::set_parameter(dest, &src->bias);
-		gnd::Conf::set_parameter(dest, &src->scale_factor);
+		gnd::conf::set_parameter(dest, &src->ad_ssmname);
+		gnd::conf::set_parameter(dest, &src->ad_ssmid);
+		gnd::conf::set_parameter(dest, &src->ad_bits);
+		gnd::conf::set_parameter(dest, &src->ratio_port);
+		gnd::conf::set_parameter(dest, &src->voltage);
+		gnd::conf::set_parameter(dest, &src->bias);
+		gnd::conf::set_parameter(dest, &src->scale_factor);
 
-		gnd::Conf::get_parameter(dest, &src->spur_adjust);
+		gnd::conf::get_parameter(dest, &src->spur_adjust);
 
-		gnd::Conf::set_parameter(dest, &src->gyrodometry);
-		gnd::Conf::set_parameter(dest, &src->error_simulation);
-		gnd::Conf::set_parameter(dest, &src->error_distributuion);
+		gnd::conf::set_parameter(dest, &src->gyrodometry);
+		gnd::conf::set_parameter(dest, &src->error_simulation);
+		gnd::conf::set_parameter(dest, &src->error_distributuion);
 
-		gnd::Conf::set_parameter(dest, &src->debug);
+		gnd::conf::set_parameter(dest, &src->debug);
 		return 0;
 	}
 
@@ -376,7 +376,7 @@ namespace Odometer {
 
 		{ // ---> operation
 			int ret;
-			gnd::Conf::FileStream fs;
+			gnd::conf::file_stream fs;
 			// configuration file read
 			if( (ret = fs.read(f)) < 0 )	return ret;
 
@@ -396,7 +396,7 @@ namespace Odometer {
 
 		{ // ---> operation
 			int ret;
-			gnd::Conf::FileStream fs;
+			gnd::conf::file_stream fs;
 			// convert configuration declaration
 			if( (ret = proc_conf_set(&fs, src)) < 0 ) return ret;
 
