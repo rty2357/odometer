@@ -31,23 +31,23 @@ namespace Odometer {
 		{"conf",	 					required_argument,	0,	'g'},
 		{"wirte-conf", 					optional_argument,	0,	'G'},
 
-		{ConfIni_KFile.token,			required_argument,	0,	'k'},
+		{ConfIni_KFile.item,			required_argument,	0,	'k'},
 
-		{ConfIni_SSMName.token,			required_argument,	0,	'n'},
-		{ConfIni_SSMID.token,			required_argument,	0,	'i'},
+		{ConfIni_SSMName.item,			required_argument,	0,	'n'},
+		{ConfIni_SSMID.item,			required_argument,	0,	'i'},
 
-		{ConfIni_ADSSMName.token,		required_argument,	0,	'A'},
-		{ConfIni_ADSSMID.token,			required_argument,	0,	'a'},
-		{ConfIni_ADBits.token,			required_argument,	0,	't'},
-		{ConfIni_RatioPort.token,		required_argument,	0,	'r'},
-		{ConfIni_Bias.token,			required_argument,	0,	'b'},
-		{ConfIni_ScaleFactor.token,		required_argument,	0,	's'},
-		{ConfIni_Voltage.token,			required_argument,	0,	'v'},
+		{ConfIni_ADSSMName.item,		required_argument,	0,	'A'},
+		{ConfIni_ADSSMID.item,			required_argument,	0,	'a'},
+		{ConfIni_ADBits.item,			required_argument,	0,	't'},
+		{ConfIni_RatioPort.item,		required_argument,	0,	'r'},
+		{ConfIni_Bias.item,				required_argument,	0,	'b'},
+		{ConfIni_ScaleFactor.item,		required_argument,	0,	's'},
+		{ConfIni_Voltage.item,			required_argument,	0,	'v'},
 
-		{ConfIni_MotorSSMName.token,	required_argument,	0,	'M'},
-		{ConfIni_MotorSSMID.token,		required_argument,	0,	'm'},
-		{ConfIni_Debug.token,			optional_argument,	0,	'D'},
-		{ConfIni_ErrorSimulation.token,	optional_argument,	0,	'E'},
+		{ConfIni_MotorSSMName.item,		required_argument,	0,	'M'},
+		{ConfIni_MotorSSMID.item,		required_argument,	0,	'm'},
+		{ConfIni_Debug.item,			optional_argument,	0,	'D'},
+		{ConfIni_ErrorSimulation.item,	optional_argument,	0,	'E'},
 		{0, 0, 0, 0}	// end of array
 	};
 }
