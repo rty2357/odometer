@@ -3,10 +3,10 @@
 LAUNCHER		:=launcher
 
 #lanch option
-LAUNCH_OPTION	:=
+LAUNCH_OPTION	:=-g odometer.conf
 
 #launch command
-LAUNCH_CMD		:=cd $(RELEASE_DIR); ./$(TARGET) $(LAUNCH_OPTION) "$$"@
+LAUNCH_CMD		:=./$(RELEASE_DIR)$(TARGET) $(LAUNCH_OPTION) "$$"@
 
 #shell command interpreter
 SHELL_INTRP		:=/bin/bash

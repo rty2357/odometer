@@ -91,11 +91,11 @@ int main(int argc, char *argv[]) {
 			::fprintf(stderr, " => get initial kinematics parameter\n");
 
 			{ // ---> set-zero kinematics property
-				odm_prop.radius_l = 0;
-				odm_prop.radius_r = 0;
-				odm_prop.tread = 0;
-				odm_prop.gear = 0;
-				odm_prop.count_rev = 0;
+				odm_prop.radius_l = pconf.k_lwheel.value;
+				odm_prop.radius_r = pconf.k_rwheel.value;
+				odm_prop.tread = pconf.k_tread.value;
+				odm_prop.gear = pconf.k_gear.value;
+				odm_prop.count_rev = pconf.k_encoder.value;
 			} // <--- set-zero kinematics property
 
 			// read kinematics configure file
@@ -261,6 +261,9 @@ int main(int argc, char *argv[]) {
 		double bias_update_ratio = 0.01;
 
 		bool error_generate = false;
+		double sum_delta_x = 0;
+		double sum_delta_y = 0;
+		double sum_delta_theta = 0;
 
 		init_time = ssm_mtr.time;
 
@@ -274,9 +277,17 @@ int main(int argc, char *argv[]) {
 		while( !::is_proc_shutoff() ){
 			// ---> read encoder counter
 			if( ssm_mtr.readNext() ){
+				int cnt1 = (pconf.k_lwheel_crot.value ? -1 : 1) * ssm_mtr.data.counter1;
+				int cnt2 = (pconf.k_rwheel_crot.value ? -1 : 1) * ssm_mtr.data.counter2;
 				double v, w;
 				double dt;
 				double vol;
+
+				if( pconf.k_swap_rwmotor.value ) {
+					int swap = cnt1;
+					cnt1 = cnt2;
+					cnt2 = swap;
+				}
 
 				if( prev_time < 0 || ssm_mtr.time <= prev_time){
 					prev_time = ssm_mtr.time;
@@ -285,8 +296,8 @@ int main(int argc, char *argv[]) {
 				dt = ssm_mtr.time - prev_time;
 
 				{ // ---> compute odometry
-					double wr = ( 2.0 * odm_prop.radius_r * M_PI * ( (double) ssm_mtr.data.counter2 ) ) / ( odm_prop.count_rev * odm_prop.gear );
-					double wl = ( 2.0 * odm_prop.radius_l * M_PI * ( (double) ssm_mtr.data.counter1 ) ) / ( odm_prop.count_rev * odm_prop.gear );
+					double wr = ( 2.0 * odm_prop.radius_r * M_PI * ( (double) cnt2 ) ) / ( odm_prop.count_rev * odm_prop.gear );
+					double wl = ( 2.0 * odm_prop.radius_l * M_PI * ( (double) cnt1 ) ) / ( odm_prop.count_rev * odm_prop.gear );
 					v = (wr + wl) / 2 / dt;
 					w = (wr - wl) / odm_prop.tread / dt;
 				} // <--- compute odometry
@@ -299,8 +310,9 @@ int main(int argc, char *argv[]) {
 					vol = ssm_ad.data.ad[pconf.ratio_port.value] * pconf.voltage.value / (1 << pconf.ad_bits.value);
 					// in the case of just about stationary
 					// compute bias
-					if( ::abs(ssm_mtr.data.counter1) ==0 && ::abs(ssm_mtr.data.counter2) ==0 ){
+					if( ::abs(cnt1) <= 3 && ::abs(cnt2) <= 3 ){
 						bias += ( vol - bias ) * bias_update_ratio;
+//						w = -gnd_deg2ang( 1.0 / pconf.scale_factor.value ) * (vol - bias);
 					}
 					else {
 						w = -gnd_deg2ang( 1.0 / pconf.scale_factor.value ) * (vol - bias);
@@ -356,8 +368,11 @@ int main(int argc, char *argv[]) {
 			while( !::is_proc_shutoff() && ssm_odmerr.readNext() ){ // ---> marge odm error
 				ssm_odometry.data.x -= ssm_odmerr.data.dx;
 				ssm_odometry.data.y -= ssm_odmerr.data.dy;
+				sum_delta_x -= ssm_odmerr.data.dx;
+				sum_delta_y -= ssm_odmerr.data.dy;
 				if( !pconf.gyrodometry.value ) {
 					ssm_odometry.data.theta -=  ssm_odmerr.data.dtheta;
+					sum_delta_theta -= ssm_odmerr.data.dtheta;
 				}
 
 				ssm_odometry.write( ssm_mtr.time );
@@ -454,7 +469,14 @@ int main(int argc, char *argv[]) {
 					::fprintf(stderr, "-------------------- \x1b[33m\x1b[1m%s\x1b[0m\x1b[39m --------------------\n", Odometer::proc_name);
 					::fprintf(stderr, "    position : %.02lf[m] %.02lf[m] %.01lf[deg]\n", ssm_odometry.data.x, ssm_odometry.data.y,  gnd_ang2deg(ssm_odometry.data.theta) );
 					::fprintf(stderr, "    velocity : v %.02lf[m/s]  w %.03lf[deg/s]\n", ssm_odometry.data.v, gnd_ang2deg(ssm_odometry.data.w) );
+					if( pconf.odmerr_id.value >= 0 ) {
+						::fprintf(stderr, "       error : %.04lf, %.04lf, %.04lf\n", ssm_odmerr.data.dx, ssm_odmerr.data.dy, ssm_odmerr.data.dtheta );
+						::fprintf(stderr, "   sum error : %.04lf, %.04lf, %.04lf\n", sum_delta_x, sum_delta_y, sum_delta_theta );
+					}
 					::fprintf(stderr, "        mode : %s\n", pconf.gyrodometry.value ? "gyrodometry" : "odometry" );
+					if( pconf.gyrodometry.value ){
+						::fprintf(stderr, "        bias : %lf\n", bias);
+					}
 					::fprintf(stderr, "\n");
 					::fprintf(stderr, " Push \x1b[1mEnter\x1b[0m to change CUI Mode\n");
 					next = cur;
